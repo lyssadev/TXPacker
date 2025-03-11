@@ -1,0 +1,121 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace "com.noxpeteam.txpacker"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.noxpeteam.txpacker"
+        minSdk 24
+        targetSdk 34
+        versionCode 3
+        versionName "1.0.2"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Specify supported ABIs
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
+        }
+        
+        // Enable CMake for native code
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17 -fvisibility=hidden -fvisibility-inlines-hidden"
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DCMAKE_CXX_VISIBILITY_PRESET=hidden",
+                          "-DCMAKE_VISIBILITY_INLINES_HIDDEN=ON"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Additional security configurations for release
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            pseudoLocalesEnabled false
+            zipAlignEnabled true
+            
+            // Native library stripping
+            ndk {
+                debugSymbolLevel 'NONE'
+            }
+        }
+        
+        debug {
+            // Debug configurations
+            minifyEnabled false
+            debuggable true
+            jniDebuggable true
+        }
+    }
+
+    // Native library packaging options
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+            // Exclude other ABIs to reduce APK size and attack surface
+            excludes += ['**/x86/**', '**/x86_64/**']
+            
+            // Strip debug symbols from native libraries
+            keepDebugSymbols += ['**/arm64-v8a/*.so', '**/armeabi-v7a/*.so']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    // Split APKs by architecture
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a'
+            universalApk true  // Also generate a universal APK
+        }
+    }
+    
+    // Configure CMake for native code
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+    
+    // Add this to specify the NDK version
+    ndkVersion "25.2.9519653"
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    
+    // Security libraries
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    implementation 'com.google.crypto.tink:tink-android:1.7.0'
+    
+    // Native library protection
+    implementation 'net.zetetic:android-database-sqlcipher:4.5.4'
+    
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+} 

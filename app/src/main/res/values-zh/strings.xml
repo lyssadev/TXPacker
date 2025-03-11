@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TXPacker</string>
+    <string name="app_subtitle">将材质包、附加包和世界导入 Minecraft</string>
+    <string name="app_instructions">1. 点击"选择文件"选择您的文件：\n   • .mcpack 用于材质包\n   • .mcaddon 用于附加包\n   • .mcworld 用于世界\n2. 选择后，点击"加载"导入到 Minecraft\n3. 应用程序将自动打开 Minecraft 并加载您的内容</string>
+    <string name="settings">设置</string>
+    <string name="language">语言</string>
+    <string name="about">关于</string>
+    <string name="version">版本 %1$s</string>
+    <string name="developers">开发者</string>
+    <string name="copyright">© 2025 保留所有权利</string>
+    <string name="go_back">返回</string>
+    <string name="select_language">选择您的首选语言</string>
+    <string name="select_file">选择文件</string>
+    <string name="load_it">加载</string>
+    <string name="selected_file">已选择文件：</string>
+    <string name="error_minecraft_not_installed">错误：无法打开 Minecraft。请检查 Minecraft 是否已安装。</string>
+    <string name="error_invalid_file_type">错误：仅支持 .mcpack、.mcaddon 和 .mcworld 文件。</string>
+    <string name="error_file_picker">错误：无法打开文件选择器。请重试。</string>
+    <string name="error_file_selection">错误：无法处理所选文件。请重试。</string>
+    <string name="resource_pack_sent">内容已发送至 Minecraft！</string>
+    <string name="minecraft_package">Minecraft 包名</string>
+    <string name="minecraft_package_desc">仅在使用不同版本的 Minecraft 时更改此项</string>
+    <string name="package_name_hint">包名</string>
+    <string name="language_system">系统语言</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_spanish">Español</string>
+    <string name="save_changes">保存更改</string>
+    <string name="unsaved_changes">未保存的更改</string>
+    <string name="unsaved_changes_message">是否要保存更改？</string>
+    <string name="save">保存</string>
+    <string name="discard">放弃</string>
+    <string name="cancel">取消</string>
+    <string name="restart_required">需要重启</string>
+    <string name="restart_message">需要重启应用以应用更改。</string>
+    <string name="restart">重启</string>
+    
+    <!-- Permission related strings -->
+    <string name="permission_required">需要权限</string>
+    <string name="storage_permission_explanation">TXPacker 需要存储权限来保存日志文件并访问 Minecraft 内容文件。</string>
+    <string name="storage_permission_denied_message">存储权限被拒绝。某些功能可能无法正常工作。</string>
+    <string name="try_again">重试</string>
+    <string name="all_files_access_explanation">TXPacker 需要管理所有文件的权限才能将日志保存在可见位置。请在下一个屏幕中授予"允许访问管理所有文件"权限。</string>
+    <string name="open_settings">打开设置</string>
+    
+    <!-- Logger related strings -->
+    <string name="log_location_toast">%1$s 日志已保存在 %2$s</string>
+    <string name="logging_settings">日志设置</string>
+    <string name="logging_settings_desc">配置应用程序日志记录以进行故障排除。默认情况下，日志记录处于禁用状态以节省存储空间。</string>
+    <string name="enable_logging">启用日志记录</string>
+    <string name="logging_enabled">日志记录已启用。日志将保存到外部存储。</string>
+    <string name="logging_disabled">日志记录已禁用。不会保存任何日志。</string>
+    <string name="minecraft_not_installed_title">未找到 Minecraft</string>
+    <string name="minecraft_not_installed_message">您的设备上未安装 Minecraft。您需要安装 Minecraft 才能使用此应用。</string>
+    <string name="install">安装</string>
+    <string name="error_open_store">无法打开应用商店。请手动安装 Minecraft。</string>
+</resources> 

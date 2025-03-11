@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TXPacker</string>
+    <string name="app_subtitle">Importa paquetes de texturas, complementos y mundos a Minecraft</string>
+    <string name="app_instructions">1. Haz clic en \"Seleccionar archivo\" para elegir tu archivo:\n   • .mcpack para paquetes de texturas\n   • .mcaddon para complementos\n   • .mcworld para mundos\n2. Una vez seleccionado, haz clic en \"Cargar\" para importar a Minecraft\n3. La aplicación abrirá automáticamente Minecraft con tu contenido</string>
+    <string name="settings">Ajustes</string>
+    <string name="language">Idioma</string>
+    <string name="about">Acerca de</string>
+    <string name="version">Versión %1$s</string>
+    <string name="developers">Desarrolladores</string>
+    <string name="copyright">© 2025 Todos los derechos reservados</string>
+    <string name="go_back">Volver</string>
+    <string name="select_language">Selecciona tu idioma preferido</string>
+    <string name="select_file">Seleccionar archivo</string>
+    <string name="load_it">Cargar</string>
+    <string name="selected_file">Archivo seleccionado:</string>
+    <string name="error_minecraft_not_installed">Error: No se pudo abrir Minecraft. Por favor, verifica si Minecraft está instalado.</string>
+    <string name="error_invalid_file_type">Error: Solo se admiten archivos .mcpack, .mcaddon y .mcworld.</string>
+    <string name="error_file_picker">Error: No se pudo abrir el selector de archivos. Por favor, inténtalo de nuevo.</string>
+    <string name="error_file_selection">Error: No se pudo procesar el archivo seleccionado. Por favor, inténtalo de nuevo.</string>
+    <string name="resource_pack_sent">¡Contenido enviado a Minecraft!</string>
+    <string name="minecraft_package">Paquete de Minecraft</string>
+    <string name="minecraft_package_desc">Cambia esto solo si estás usando una versión diferente de Minecraft</string>
+    <string name="package_name_hint">Nombre del paquete</string>
+    <string name="language_system">Idioma del sistema</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_spanish">Español</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="unsaved_changes">Cambios sin guardar</string>
+    <string name="unsaved_changes_message">¿Deseas guardar los cambios?</string>
+    <string name="save">Guardar</string>
+    <string name="discard">Descartar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="restart_required">Reinicio requerido</string>
+    <string name="restart_message">Es necesario reiniciar para aplicar los cambios.</string>
+    <string name="restart">Reiniciar</string>
+    
+    <!-- Permission related strings -->
+    <string name="permission_required">Permiso requerido</string>
+    <string name="storage_permission_explanation">TXPacker necesita permiso de almacenamiento para guardar archivos de registro y acceder a archivos de contenido de Minecraft.</string>
+    <string name="storage_permission_denied_message">Permiso de almacenamiento denegado. Algunas funciones pueden no funcionar correctamente.</string>
+    <string name="try_again">Intentar de nuevo</string>
+    <string name="all_files_access_explanation">TXPacker necesita permiso para administrar todos los archivos para guardar registros en una ubicación visible. Por favor, concede \"Permitir acceso para administrar todos los archivos\" en la siguiente pantalla.</string>
+    <string name="open_settings">Abrir Configuración</string>
+    
+    <!-- Logger related strings -->
+    <string name="log_location_toast">%1$s Registros guardados en %2$s</string>
+    <string name="logging_settings">Configuración de Registros</string>
+    <string name="logging_settings_desc">Configura el registro de la aplicación para solucionar problemas. Los registros están desactivados por defecto para ahorrar espacio de almacenamiento.</string>
+    <string name="enable_logging">Activar Registros</string>
+    <string name="logging_enabled">El registro está habilitado. Los registros se guardarán en el almacenamiento externo.</string>
+    <string name="logging_disabled">El registro está deshabilitado. No se guardarán registros.</string>
+    <string name="minecraft_not_installed_title">Minecraft no encontrado</string>
+    <string name="minecraft_not_installed_message">Minecraft no está instalado en tu dispositivo. Necesitas instalar Minecraft para usar esta aplicación.</string>
+    <string name="install">Instalar</string>
+    <string name="error_open_store">No se pudo abrir Play Store. Por favor, instala Minecraft manualmente.</string>
+</resources> 

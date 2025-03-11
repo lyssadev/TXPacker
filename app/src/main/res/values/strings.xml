@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TXPacker</string>
+    <string name="app_subtitle">Import Texture Packs, Add-ons, and Worlds into Minecraft</string>
+    <string name="app_instructions">1. Click \"Select File\" to choose your file:\n   • .mcpack for texture packs\n   • .mcaddon for add-ons\n   • .mcworld for worlds\n2. Once selected, click \"Load it\" to import into Minecraft\n3. The app will automatically open Minecraft with your content</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="about">About</string>
+    <string name="version">Version %1$s</string>
+    <string name="developers">Developers</string>
+    <string name="copyright">© 2025 All rights reserved</string>
+    <string name="go_back">Go back</string>
+    <string name="select_language">Select your preferred language</string>
+    <string name="select_file">Select File</string>
+    <string name="load_it">Load it</string>
+    <string name="selected_file">Selected File:</string>
+    <string name="error_minecraft_not_installed">Error: Could not open Minecraft. Please check if Minecraft is installed.</string>
+    <string name="error_invalid_file_type">Error: Only .mcpack, .mcaddon, and .mcworld files are supported.</string>
+    <string name="error_file_picker">Error: Could not open file picker. Please try again.</string>
+    <string name="error_file_selection">Error: Could not process the selected file. Please try again.</string>
+    <string name="resource_pack_sent">Content sent to Minecraft!</string>
+    <string name="minecraft_package">Minecraft Package</string>
+    <string name="minecraft_package_desc">Change this only if you\'re using a different version of Minecraft</string>
+    <string name="package_name_hint">Package Name</string>
+    <string name="language_system">System Language</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_spanish">Español</string>
+    <string name="save_changes">Save changes</string>
+    <string name="unsaved_changes">Unsaved Changes</string>
+    <string name="unsaved_changes_message">Do you want to save your changes?</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard</string>
+    <string name="cancel">Cancel</string>
+    <string name="restart_required">Restart Required</string>
+    <string name="restart_message">A restart is mandatory to apply the changes.</string>
+    <string name="restart">Restart</string>
+    
+    <!-- Permission related strings -->
+    <string name="permission_required">Permission Required</string>
+    <string name="storage_permission_explanation">TXPacker needs storage permission to save log files and access Minecraft content files.</string>
+    <string name="storage_permission_denied_message">Storage permission denied. Some features may not work properly.</string>
+    <string name="try_again">Try Again</string>
+    <string name="all_files_access_explanation">TXPacker needs permission to manage all files to save logs in a visible location. Please grant \"Allow access to manage all files\" in the next screen.</string>
+    <string name="open_settings">Open Settings</string>
+    
+    <!-- Logger related strings -->
+    <string name="log_location_toast">%1$s Logs saved in %2$s</string>
+    <string name="logging_settings">Logging Settings</string>
+    <string name="logging_settings_desc">Configure app logging for troubleshooting. Logs are disabled by default to save storage space.</string>
+    <string name="enable_logging">Enable Logging</string>
+    <string name="logging_enabled">Logging is enabled. Logs will be saved to external storage.</string>
+    <string name="logging_disabled">Logging is disabled. No logs will be saved.</string>
+    <string name="minecraft_not_installed_title">Minecraft Not Found</string>
+    <string name="minecraft_not_installed_message">Minecraft is not installed on your device. You need to install Minecraft to use this app.</string>
+    <string name="install">Install</string>
+    <string name="error_open_store">Could not open Play Store. Please install Minecraft manually.</string>
+</resources>

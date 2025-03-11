@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material default colors -->
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+
+    <!-- App theme colors -->
+    <color name="primary">#BB86FC</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="primary_variant">#3700B3</color>
+    <color name="accent">#03DAC6</color>
+    
+    <!-- Dark theme colors -->
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#121212</color>
+    <color name="error">#CF6679</color>
+    <color name="text_secondary_dark">#B3FFFFFF</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    
+    <!-- New UI colors -->
+    <color name="gradient_start">#BB86FC</color>
+    <color name="gradient_center">#9E86FC</color>
+    <color name="gradient_end">#03DAC5</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#E6E6E6</color>
+    <color name="text_tertiary">#A0A0A0</color>
+    <color name="card_background_start">#1A1A24</color>
+    <color name="card_background_center">#22222E</color>
+    <color name="card_background_end">#2A2A38</color>
+    <color name="card_stroke">#30FFFFFF</color>
+    <color name="button_stroke">#20FFFFFF</color>
+    <color name="ripple_light">#40FFFFFF</color>
+</resources>
