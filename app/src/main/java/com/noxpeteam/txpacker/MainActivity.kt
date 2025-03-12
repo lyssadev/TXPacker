@@ -60,20 +60,14 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize Logger
-        Logger.initialize(applicationContext)
-        
-        // Initialize PermissionManager
-        permissionManager = PermissionManager(this)
-        permissionManager.initialize()
-        
-        // Request storage permissions
-        requestStoragePermissions()
-        
-        // Log app start
-        Logger.getInstance().logInfo("App started")
-        
         try {
+            // Initialize Logger
+            Logger.initialize(applicationContext)
+            
+            // Initialize PermissionManager
+            permissionManager = PermissionManager(this)
+            permissionManager.initialize()
+            
             // Set window flags before setting content view
             WindowCompat.setDecorFitsSystemWindows(window, false)
             
@@ -91,24 +85,20 @@ class MainActivity : BaseActivity() {
                 // Log that we're using system language
                 Logger.getInstance().logInfo("Using system language")
             }
-
+            
+            // Set the content view
             setContentView(R.layout.activity_main)
-
-            // Initialize views
-            initializeViews()
-
-            // Post animations to next frame to ensure views are laid out
-            findViewById<View>(android.R.id.content).post {
-                setupInitialAnimations()
-            }
-
-            // Set up click listeners
-            setupClickListeners()
-
+            
+            // Request permissions and initialize the app
+            requestStoragePermissions()
+            
+            // Log app start
+            Logger.getInstance().logInfo("App started")
+            
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate: ${e.message}", e)
             Logger.getInstance().logError("Error in onCreate", e)
-            e.printStackTrace()
+            finish()
         }
     }
 
@@ -493,20 +483,33 @@ class MainActivity : BaseActivity() {
      */
     private fun requestStoragePermissions() {
         if (!permissionManager.hasStoragePermissions()) {
-            permissionManager.requestStoragePermissions { granted ->
-                if (granted) {
-                    Logger.getInstance().logInfo("Storage permissions granted")
-                    // Initialize logger files
-                    Logger.getInstance().cleanupOldLogs()
-                } else {
-                    Logger.getInstance().logWarning("Storage permissions denied")
-                    showPermissionDeniedDialog()
+            // Show the initial permission explanation dialog
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.permission_required))
+                .setMessage(getString(R.string.storage_permission_explanation))
+                .setPositiveButton(getString(R.string.try_again)) { _, _ ->
+                    // Request the permission
+                    permissionManager.requestStoragePermissions { granted ->
+                        if (granted) {
+                            // Permission granted, proceed with app initialization
+                            Logger.getInstance().logInfo("Storage permissions granted")
+                            initializeApp()
+                        } else {
+                            // Permission denied, show a message and close the app
+                            Logger.getInstance().logWarning("Storage permissions denied")
+                            showPermissionDeniedDialog()
+                        }
+                    }
                 }
-            }
+                .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                    // User cancelled, close the app
+                    finish()
+                }
+                .setCancelable(false)
+                .show()
         } else {
-            // Permissions already granted
-            Logger.getInstance().logInfo("Storage permissions already granted")
-            Logger.getInstance().cleanupOldLogs()
+            // Permissions already granted, proceed with app initialization
+            initializeApp()
         }
     }
     
@@ -514,48 +517,27 @@ class MainActivity : BaseActivity() {
      * Show a dialog explaining why permissions are needed
      */
     private fun showPermissionDeniedDialog() {
-        // Special handling for Android 11+ (API 30+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.permission_required)
-                .setMessage(R.string.all_files_access_explanation)
-                .setPositiveButton(R.string.open_settings) { _, _ ->
-                    try {
-                        // Since we're already in the R+ block, no need to check again
-                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                            data = "package:$packageName".toUri()
-                        }
-                        startActivity(intent)
-                    } catch (e: Exception) {
-                        Logger.getInstance().logError("Error opening settings for MANAGE_EXTERNAL_STORAGE", e)
-                        // Fallback to regular settings
-                        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = "package:$packageName".toUri()
-                        }
-                        startActivity(settingsIntent)
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.permission_required))
+            .setMessage(getString(R.string.storage_permission_denied_message))
+            .setPositiveButton(getString(R.string.open_settings)) { _, _ ->
+                try {
+                    // Open app settings
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
                     }
+                    startActivity(intent)
+                    finish()
+                } catch (e: Exception) {
+                    Logger.getInstance().logError("Error opening app settings", e)
+                    finish()
                 }
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
-                    dialog.dismiss()
-                    showSnackbar(getString(R.string.storage_permission_denied_message))
-                }
-                .setCancelable(false)
-                .show()
-        } else {
-            // Regular permission dialog for older Android versions
-            AlertDialog.Builder(this)
-                .setTitle(R.string.permission_required)
-                .setMessage(R.string.storage_permission_explanation)
-                .setPositiveButton(R.string.try_again) { _, _ ->
-                    requestStoragePermissions()
-                }
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
-                    dialog.dismiss()
-                    showSnackbar(getString(R.string.storage_permission_denied_message))
-                }
-                .setCancelable(false)
-                .show()
-        }
+            }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
     }
     
     /**
@@ -582,5 +564,18 @@ class MainActivity : BaseActivity() {
         } catch (e: Exception) {
             Logger.getInstance().logError("Error setting locale", e)
         }
+    }
+
+    private fun initializeApp() {
+        // Initialize views and set up the UI
+        initializeViews()
+        
+        // Post animations to next frame to ensure views are laid out
+        findViewById<View>(android.R.id.content).post {
+            setupInitialAnimations()
+        }
+        
+        // Set up click listeners
+        setupClickListeners()
     }
 }

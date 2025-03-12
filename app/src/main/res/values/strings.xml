@@ -7,8 +7,8 @@
     <string name="language">Language</string>
     <string name="about">About</string>
     <string name="version">Version %1$s</string>
-    <string name="developers">Developers</string>
-    <string name="copyright">© 2025 All rights reserved</string>
+    <string name="developers">Developed by NoxPE Team</string>
+    <string name="copyright">© 2025 NoxPE Team. All rights reserved.</string>
     <string name="go_back">Go back</string>
     <string name="select_language">Select your preferred language</string>
     <string name="select_file">Select File</string>
@@ -56,4 +56,5 @@
     <string name="install">Install</string>
     <string name="error_open_store">Could not open Play Store. Please install Minecraft manually.</string>
     <string name="go_to_logs">Go to logs</string>
+    <string name="invalid_package_error">Please enter a valid Minecraft package name</string>
 </resources>

@@ -56,4 +56,5 @@
     <string name="install">Instalar</string>
     <string name="error_open_store">No se pudo abrir Play Store. Por favor, instala Minecraft manualmente.</string>
     <string name="go_to_logs">Ver registros</string>
+    <string name="invalid_package_error">Por favor, introduce un nombre de paquete de Minecraft válido</string>
 </resources> 

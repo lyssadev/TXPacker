@@ -7,8 +7,8 @@
     <string name="language">语言</string>
     <string name="about">关于</string>
     <string name="version">版本 %1$s</string>
-    <string name="developers">开发者</string>
-    <string name="copyright">© 2025 保留所有权利</string>
+    <string name="developers">由 NoxPE 团队开发</string>
+    <string name="copyright">© 2025 NoxPE 团队。保留所有权利。</string>
     <string name="go_back">返回</string>
     <string name="select_language">选择您的首选语言</string>
     <string name="select_file">选择文件</string>
@@ -56,4 +56,5 @@
     <string name="install">安装</string>
     <string name="error_open_store">无法打开应用商店。请手动安装 Minecraft。</string>
     <string name="go_to_logs">查看日志</string>
+    <string name="invalid_package_error">请输入有效的 Minecraft 包名</string>
 </resources> 

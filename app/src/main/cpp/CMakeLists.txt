@@ -10,8 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fvisibility=hidden -fstac
 add_library(
         txpacker
         SHARED
-        txpackerlib.cpp
-        tokyo.cpp
+        txpacker.cpp
 )
 
 # Link the library with the Android log library

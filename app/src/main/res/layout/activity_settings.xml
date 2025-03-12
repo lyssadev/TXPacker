@@ -62,6 +62,68 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- App Info Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#1F1F1F"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <FrameLayout
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/app_icon_circle"
+                            android:contentDescription="@string/app_name" />
+
+                        <ImageView
+                            android:id="@+id/appIcon"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="16dp"
+                            android:src="@mipmap/ic_launcher"
+                            android:contentDescription="@string/app_name" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/app_name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/versionText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="#9E9E9E"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/versionCodeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="#757575"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Language Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -78,76 +140,46 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/languageLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="@string/language"
-                        android:textColor="#BB86FC"
+                        android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:text="@string/select_language"
-                        android:textColor="#9E9E9E"
-                        android:textSize="14sp" />
-
-                    <com.google.android.material.chip.ChipGroup
+                    <RadioGroup
                         android:id="@+id/languageGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:singleSelection="true"
-                        app:selectionRequired="true"
-                        app:chipSpacingHorizontal="8dp"
-                        app:chipSpacingVertical="8dp">
+                        android:layout_marginTop="8dp">
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/systemButton"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
+                        <RadioButton
+                            android:id="@+id/systemLanguage"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/language_system"
-                            android:textColor="@color/chip_text_color"
-                            app:chipBackgroundColor="@color/chip_background_color"
-                            app:chipStrokeColor="#BB86FC"
-                            app:chipStrokeWidth="1dp" />
+                            android:textColor="#E0E0E0" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/englishButton"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
+                        <RadioButton
+                            android:id="@+id/englishLanguage"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/language_english"
-                            android:textColor="@color/chip_text_color"
-                            app:chipBackgroundColor="@color/chip_background_color"
-                            app:chipStrokeColor="#BB86FC"
-                            app:chipStrokeWidth="1dp" />
+                            android:textColor="#E0E0E0" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chineseButton"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
+                        <RadioButton
+                            android:id="@+id/chineseLanguage"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/language_chinese"
-                            android:textColor="@color/chip_text_color"
-                            app:chipBackgroundColor="@color/chip_background_color"
-                            app:chipStrokeColor="#BB86FC"
-                            app:chipStrokeWidth="1dp" />
+                            android:textColor="#E0E0E0" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/spanishButton"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
+                        <RadioButton
+                            android:id="@+id/spanishLanguage"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/language_spanish"
-                            android:textColor="@color/chip_text_color"
-                            app:chipBackgroundColor="@color/chip_background_color"
-                            app:chipStrokeColor="#BB86FC"
-                            app:chipStrokeWidth="1dp" />
-                    </com.google.android.material.chip.ChipGroup>
+                            android:textColor="#E0E0E0" />
+                    </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -169,16 +201,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="@string/minecraft_package"
-                        android:textColor="#BB86FC"
+                        android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginTop="4dp"
                         android:text="@string/minecraft_package_desc"
                         android:textColor="#9E9E9E"
                         android:textSize="14sp" />
@@ -186,23 +216,25 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:hint="@string/package_name_hint"
                         app:boxBackgroundColor="#2F2F2F"
-                        app:boxStrokeColor="#BB86FC"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
                         app:hintTextColor="#BB86FC">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/packageEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="#E0E0E0"
-                            android:inputType="text"
-                            android:maxLines="1" />
+                            android:textColor="#FFFFFF" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Logging Settings Section -->
+            <!-- Logging Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -220,70 +252,44 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="@string/logging_settings"
-                        android:textColor="#BB86FC"
+                        android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginTop="4dp"
                         android:text="@string/logging_settings_desc"
                         android:textColor="#9E9E9E"
                         android:textSize="14sp" />
 
-                    <LinearLayout
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/loggingSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/enable_logging"
-                            android:textColor="#E0E0E0"
-                            android:textSize="16sp"
-                            android:fontFamily="sans-serif-medium" />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/loggingSwitch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="false"
-                            android:theme="@style/SwitchTheme"
-                            app:thumbTint="@color/switch_thumb_color"
-                            app:trackTint="@color/switch_track_color"
-                            app:switchMinWidth="52dp"
-                            app:thumbRadius="10dp"
-                            android:layout_marginStart="16dp" />
-                    </LinearLayout>
+                        android:layout_marginTop="8dp"
+                        android:text="@string/enable_logging"
+                        android:textColor="#E0E0E0" />
 
                     <TextView
                         android:id="@+id/loggingStatusText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/logging_disabled"
+                        android:layout_marginTop="4dp"
                         android:textColor="#9E9E9E"
                         android:textSize="14sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/goToLogsButton"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="8dp"
                         android:text="@string/go_to_logs"
                         android:textAllCaps="false"
-                        android:letterSpacing="0.025"
-                        android:backgroundTint="#BB86FC"
                         android:textColor="#000000"
-                        app:cornerRadius="28dp"
-                        android:fontFamily="sans-serif-medium" />
+                        app:backgroundTint="#BB86FC"
+                        app:cornerRadius="20dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -291,6 +297,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#1F1F1F"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
@@ -304,48 +311,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="@string/about"
-                        android:textColor="#BB86FC"
+                        android:textColor="#FFFFFF"
                         android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/versionText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#E0E0E0"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/developers"
-                        android:textColor="#9E9E9E"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:id="@+id/developerNamesText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/developers"
                         android:textColor="#E0E0E0"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/teamCreditText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#BB86FC"
-                        android:textSize="14sp"
-                        android:textStyle="italic"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:text="@string/copyright"
                         android:textColor="#9E9E9E"
                         android:textSize="12sp" />

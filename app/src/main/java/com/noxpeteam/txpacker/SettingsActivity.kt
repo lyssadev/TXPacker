@@ -1,15 +1,19 @@
 package com.noxpeteam.txpacker
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -29,6 +33,11 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.card.MaterialCardView
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
+import android.view.Window
+import android.view.animation.AccelerateInterpolator
+import android.widget.RadioGroup
+import android.widget.ImageView
+import android.widget.RadioButton
 
 class SettingsActivity : BaseActivity() {
     private var hasUnsavedChanges = false
@@ -39,91 +48,169 @@ class SettingsActivity : BaseActivity() {
     private lateinit var loggingStatusText: TextView
     private lateinit var teamCreditText: TextView
     private lateinit var goToLogsButton: MaterialButton
+    private lateinit var backButton: ImageButton
+    private lateinit var packageEditText: EditText
+    private lateinit var developerNamesText: TextView
+    private lateinit var appIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        // Initialize Logger
         try {
-            Logger.getInstance()
-        } catch (e: IllegalStateException) {
-            Logger.initialize(applicationContext)
+            super.onCreate(savedInstanceState)
+            
+            // Set window animations
+            window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+            window.enterTransition = android.transition.TransitionInflater.from(this)
+                .inflateTransition(android.R.transition.fade)
+            window.exitTransition = android.transition.TransitionInflater.from(this)
+                .inflateTransition(android.R.transition.fade)
+            
+            // Initialize Logger
+            try {
+                Logger.getInstance()
+            } catch (e: IllegalStateException) {
+                Logger.initialize(applicationContext)
+            }
+            
+            setContentView(R.layout.activity_settings)
+
+            // Initialize views
+            initializeViews()
+            
+            // Set up animations and listeners
+            setupAnimationsAndListeners()
+            
+            // Log activity start
+            Logger.getInstance().logInfo("Settings activity opened")
+            
+        } catch (e: Exception) {
+            // Log the crash and rethrow
+            Logger.getInstance().logCrash(e)
+            throw e
         }
-        
-        setContentView(R.layout.activity_settings)
+    }
 
-        // Initialize views
-        val backButton = findViewById<ImageButton>(R.id.backButton)
-        val versionText = findViewById<TextView>(R.id.versionText)
-        val packageEditText = findViewById<EditText>(R.id.packageEditText)
-        val developerNamesText = findViewById<TextView>(R.id.developerNamesText)
-        teamCreditText = findViewById(R.id.teamCreditText)
-        saveButtonContainer = findViewById(R.id.saveButtonContainer)
-        saveButton = findViewById(R.id.saveButton)
-        saveProgress = findViewById(R.id.saveProgress)
-        loggingSwitch = findViewById(R.id.loggingSwitch)
-        loggingStatusText = findViewById(R.id.loggingStatusText)
-        goToLogsButton = findViewById(R.id.goToLogsButton)
+    private fun initializeViews() {
+        try {
+            // Initialize views
+            backButton = findViewById(R.id.backButton)
+            val versionText = findViewById<TextView>(R.id.versionText)
+            val versionCodeText = findViewById<TextView>(R.id.versionCodeText)
+            packageEditText = findViewById(R.id.packageEditText)
+            developerNamesText = findViewById(R.id.developerNamesText)
+            teamCreditText = findViewById(R.id.teamCreditText)
+            saveButtonContainer = findViewById(R.id.saveButtonContainer)
+            saveButton = findViewById(R.id.saveButton)
+            saveProgress = findViewById(R.id.saveProgress)
+            loggingSwitch = findViewById(R.id.loggingSwitch)
+            loggingStatusText = findViewById(R.id.loggingStatusText)
+            goToLogsButton = findViewById(R.id.goToLogsButton)
+            appIcon = findViewById(R.id.appIcon)
 
+            // Load app icon
+            try {
+                // Try to load the app icon from the package manager
+                val appIconDrawable = packageManager.getApplicationIcon(packageName)
+                appIcon.setImageDrawable(appIconDrawable)
+            } catch (e: Exception) {
+                // Fallback to mipmap icon if package manager fails
+                appIcon.setImageResource(R.mipmap.ic_launcher)
+                Logger.getInstance().logWarning("Failed to load app icon from package manager", e)
+            }
+
+            // Set version information with fade animation
+            versionText.alpha = 0f
+            versionCodeText.alpha = 0f
+            
+            versionText.text = getString(R.string.version, BuildConfig.VERSION_NAME)
+            versionCodeText.text = "Build ${BuildConfig.VERSION_CODE}"
+            
+            versionText.animate()
+                .alpha(1f)
+                .setDuration(500)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+            
+            versionCodeText.animate()
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay(100)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+            
+            // Set developer names and team credit with slide animation
+            developerNamesText.text = getString(R.string.developers)
+            developerNamesText.visibility = View.VISIBLE
+            developerNamesText.translationX = -50f
+            developerNamesText.alpha = 0f
+            
+            teamCreditText.text = getString(R.string.copyright)
+            teamCreditText.visibility = View.VISIBLE
+            teamCreditText.translationX = -50f
+            teamCreditText.alpha = 0f
+            
+            developerNamesText.animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+            
+            teamCreditText.animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay(100)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+            
+        } catch (e: Exception) {
+            Logger.getInstance().logCrash(e)
+            throw e
+        }
+    }
+
+    private fun setupAnimationsAndListeners() {
         // Get all card views for animation
         val scrollView = findViewById<ScrollView>(R.id.scrollView)
         val linearLayout = scrollView.getChildAt(0) as LinearLayout
         val cards = mutableListOf<View>()
+        
+        // Enhanced card styling
         for (i in 0 until linearLayout.childCount) {
             val child = linearLayout.getChildAt(i)
             if (child is MaterialCardView) {
                 // Initially hide all cards
                 child.alpha = 0f
                 child.translationY = 100f
+                child.translationX = -30f // Add slight horizontal offset
                 cards.add(child)
+                
+                // Enhanced card styling
+                child.cardElevation = 8f
+                child.radius = resources.getDimension(R.dimen.card_corner_radius)
+                child.setCardBackgroundColor(getColor(R.color.card_background))
+                
+                // Add ripple effect
+                child.setOnClickListener { } // Empty click listener for ripple
             }
         }
 
-        // Animate cards sequentially
-        var delay = 0L
-        val animDuration = 400L
-        val staggerDelay = 100L
+        // Improved card entry animation
+        var delay = 100L
+        val animDuration = 700L // Longer duration for smoother animation
+        val staggerDelay = 150L // More pronounced stagger
 
         cards.forEach { card ->
             card.animate()
                 .alpha(1f)
                 .translationY(0f)
+                .translationX(0f)
                 .setDuration(animDuration)
                 .setStartDelay(delay)
-                .setInterpolator(DecelerateInterpolator())
+                .setInterpolator(DecelerateInterpolator(1.8f)) // More pronounced deceleration
                 .start()
             delay += staggerDelay
         }
-
-        // Set version from BuildConfig
-        versionText.text = getString(R.string.version, BuildConfig.VERSION_NAME)
-        
-        // Set developer names from native library
-        try {
-            if (NativeTextProvider.isNativeLibraryLoaded()) {
-                developerNamesText.text = NativeTextProvider.getDeveloperCredits()
-            } else {
-                developerNamesText.visibility = View.GONE
-            }
-        } catch (e: Exception) {
-            Logger.getInstance().logError("Error loading native developer credits", e)
-            developerNamesText.visibility = View.GONE
-        }
-        
-        // Set team credit text from native library
-        try {
-            if (NativeTextProvider.isNativeLibraryLoaded()) {
-                teamCreditText.text = NativeTextProvider.getTeamCreditText()
-            } else {
-                teamCreditText.visibility = View.GONE
-            }
-        } catch (e: Exception) {
-            teamCreditText.visibility = View.GONE
-            Logger.getInstance().logError("Error loading native text", e)
-        }
-
-        // Log activity start
-        Logger.getInstance().logInfo("Settings activity opened")
 
         // Handle back press
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -168,64 +255,120 @@ class SettingsActivity : BaseActivity() {
             }
         })
         
-        // Set the correct chip and ensure it's checked
-        val languageChipGroup = findViewById<ChipGroup>(R.id.languageGroup)
-        languageChipGroup.isSingleSelection = true
-        languageChipGroup.isSelectionRequired = true
+        // Set the correct radio button and ensure it's checked
+        val languageGroup = findViewById<RadioGroup>(R.id.languageGroup)
+        
+        // Style the radio buttons
+        for (i in 0 until languageGroup.childCount) {
+            val radioButton = languageGroup.getChildAt(i)
+            if (radioButton is RadioButton) {
+                // Set text colors
+                radioButton.setTextColor(ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_checked),
+                        intArrayOf(-android.R.attr.state_checked)
+                    ),
+                    intArrayOf(
+                        getColor(R.color.primary), // Checked color
+                        getColor(R.color.text_secondary) // Unchecked color
+                    )
+                ))
+                
+                // Set button tint
+                radioButton.buttonTintList = ColorStateList(
+                    arrayOf(
+                        intArrayOf(android.R.attr.state_checked),
+                        intArrayOf(-android.R.attr.state_checked)
+                    ),
+                    intArrayOf(
+                        getColor(R.color.primary), // Checked color
+                        getColor(R.color.text_tertiary) // Unchecked color
+                    )
+                )
+                
+                // Add ripple effect
+                radioButton.background = RippleDrawable(
+                    ColorStateList.valueOf(getColor(R.color.ripple_light)),
+                    null,
+                    null
+                )
+            }
+        }
         
         // Set initial selection
         when (currentLang) {
-            "" -> languageChipGroup.check(R.id.systemButton)
-            "en" -> languageChipGroup.check(R.id.englishButton)
-            "zh" -> languageChipGroup.check(R.id.chineseButton)
-            "es" -> languageChipGroup.check(R.id.spanishButton)
+            "" -> languageGroup.check(R.id.systemLanguage)
+            "en" -> languageGroup.check(R.id.englishLanguage)
+            "zh" -> languageGroup.check(R.id.chineseLanguage)
+            "es" -> languageGroup.check(R.id.spanishLanguage)
         }
 
         // Initialize animations
-        val selectAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.chip_select)
-        val deselectAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.chip_deselect)
+        val selectAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.radio_select)
+        val deselectAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.radio_deselect)
 
-        // Keep track of previously selected chip
-        var previousChip: View? = languageChipGroup.findViewById(languageChipGroup.checkedChipId)
-        previousChip?.startAnimation(selectAnim)
+        // Keep track of previously selected radio button
+        var previousSelection: View? = languageGroup.findViewById(languageGroup.checkedRadioButtonId)
+        previousSelection?.startAnimation(selectAnim)
 
         // Handle language selection with animations
-        languageChipGroup.setOnCheckedChangeListener { group: ChipGroup, checkedId: Int ->
-            // Ensure a chip is always selected
-            if (checkedId == View.NO_ID) {
-                group.check(R.id.systemButton)
-                return@setOnCheckedChangeListener
+        languageGroup.setOnCheckedChangeListener { _, checkedId ->
+            // Find the selected button
+            val selectedButton = languageGroup.findViewById<RadioButton>(checkedId)
+            
+            // Animate previous selection out
+            previousSelection?.let { prev ->
+                if (prev is RadioButton) {
+                    prev.startAnimation(deselectAnim)
+                    // Update text color with fade
+                    val colorAnim = ObjectAnimator.ofArgb(
+                        prev,
+                        "textColor",
+                        getColor(R.color.primary),
+                        getColor(R.color.text_secondary)
+                    )
+                    colorAnim.duration = 250
+                    colorAnim.start()
+                }
             }
-
-            // Animate chip selection
-            val selectedChip = group.findViewById<View>(checkedId)
-            previousChip?.startAnimation(deselectAnim)
-            selectedChip.startAnimation(selectAnim)
-            previousChip = selectedChip
+            
+            // Animate new selection in
+            selectedButton?.let { selected ->
+                selected.startAnimation(selectAnim)
+                // Update text color with fade
+                val colorAnim = ObjectAnimator.ofArgb(
+                    selected,
+                    "textColor",
+                    getColor(R.color.text_secondary),
+                    getColor(R.color.primary)
+                )
+                colorAnim.duration = 300
+                colorAnim.start()
+            }
+            
+            previousSelection = selectedButton
 
             val lang = when (checkedId) {
-                R.id.systemButton -> ""
-                R.id.englishButton -> "en"
-                R.id.chineseButton -> "zh"
-                R.id.spanishButton -> "es"
+                R.id.systemLanguage -> ""
+                R.id.englishLanguage -> "en"
+                R.id.chineseLanguage -> "zh"
+                R.id.spanishLanguage -> "es"
                 else -> ""  // Default to system language
             }
             
             if (lang != currentLang) {
+                // Add haptic feedback
+                selectedButton?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                 showSaveButton()
             }
         }
 
-        // Handle back button
+        // Handle back button with custom animation
         backButton.setOnClickListener {
             if (hasUnsavedChanges) {
                 showUnsavedChangesDialog()
             } else {
-                finish()
-                ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
-                    .toBundle()?.let { _ ->
-                        finishAfterTransition()
-                    }
+                finishWithAnimation()
             }
         }
 
@@ -313,20 +456,30 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun saveChanges() {
+        // Get current values
+        val packageEditText = findViewById<EditText>(R.id.packageEditText)
+        val newPackage = packageEditText.text.toString()
+
+        // Validate package name
+        if (!validatePackageName(newPackage)) {
+            packageEditText.error = getString(R.string.invalid_package_error)
+            // Hide progress if it was showing
+            saveProgress.visibility = View.GONE
+            saveButton.visibility = View.VISIBLE
+            return
+        }
+
         // Show progress
         saveButton.visibility = View.INVISIBLE
         saveProgress.visibility = View.VISIBLE
 
-        // Get current values
-        val packageEditText = findViewById<EditText>(R.id.packageEditText)
-        val languageChipGroup = findViewById<ChipGroup>(R.id.languageGroup)
-        val newPackage = packageEditText.text.toString()
-        val checkedId = languageChipGroup.checkedChipId
+        val languageGroup = findViewById<RadioGroup>(R.id.languageGroup)
+        val checkedId = languageGroup.checkedRadioButtonId
         val newLang = when (checkedId) {
-            R.id.systemButton -> ""
-            R.id.englishButton -> "en"
-            R.id.chineseButton -> "zh"
-            R.id.spanishButton -> "es"
+            R.id.systemLanguage -> ""
+            R.id.englishLanguage -> "en"
+            R.id.chineseLanguage -> "zh"
+            R.id.spanishLanguage -> "es"
             else -> ""  // Default to system language
         }
         val loggingEnabled = loggingSwitch.isChecked
@@ -380,6 +533,10 @@ class SettingsActivity : BaseActivity() {
         }, 1000)
     }
 
+    private fun validatePackageName(packageName: String): Boolean {
+        return packageName.isNotBlank() && packageName.matches(Regex("[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)*"))
+    }
+
     private fun showUnsavedChangesDialog() {
         try {
             MaterialAlertDialogBuilder(this)
@@ -394,6 +551,53 @@ class SettingsActivity : BaseActivity() {
                 .show()
         } catch (e: Exception) {
             Logger.getInstance().logError("Error showing unsaved changes dialog", e)
+        }
+    }
+
+    private fun finishWithAnimation() {
+        // Animate cards out sequentially
+        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        val linearLayout = scrollView.getChildAt(0) as LinearLayout
+        val cards = mutableListOf<View>()
+        
+        for (i in 0 until linearLayout.childCount) {
+            val child = linearLayout.getChildAt(i)
+            if (child is MaterialCardView) {
+                cards.add(child)
+            }
+        }
+
+        var delay = 0L
+        val animDuration = 500L // Longer exit animation
+        val staggerDelay = 100L
+
+        // Enhanced exit animation
+        cards.asReversed().forEach { card ->
+            card.animate()
+                .alpha(0f)
+                .translationY(50f)
+                .translationX(30f) // Add horizontal movement
+                .setDuration(animDuration)
+                .setStartDelay(delay)
+                .setInterpolator(AccelerateInterpolator(1.8f))
+                .start()
+            delay += staggerDelay
+        }
+
+        // Finish activity after animations complete
+        Handler(Looper.getMainLooper()).postDelayed({
+            finish()
+            // Use custom animations for activity transition
+            overridePendingTransition(R.anim.fade_in, R.anim.slide_out_right)
+        }, delay + animDuration)
+    }
+
+    override fun onBackPressed() {
+        if (hasUnsavedChanges) {
+            showUnsavedChangesDialog()
+        } else {
+            super.onBackPressed()
+            finishWithAnimation()
         }
     }
 

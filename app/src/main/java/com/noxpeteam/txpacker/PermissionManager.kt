@@ -36,12 +36,14 @@ class PermissionManager(private val activity: AppCompatActivity) {
     }
     
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var manageStorageLauncher: ActivityResultLauncher<Intent>
     private var permissionCallback: ((Boolean) -> Unit)? = null
     
     /**
      * Initialize the permission launcher
      */
     fun initialize() {
+        // Initialize regular permission launcher
         permissionLauncher = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -55,6 +57,28 @@ class PermissionManager(private val activity: AppCompatActivity) {
                 requestManageExternalStoragePermission()
             } else {
                 permissionCallback?.invoke(allGranted)
+            }
+        }
+        
+        // Initialize manage storage launcher
+        manageStorageLauncher = activity.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            // Check if the permission was granted
+            val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Environment.isExternalStorageManager()
+            } else {
+                true
+            }
+            
+            // Invoke callback with result
+            permissionCallback?.invoke(hasPermission)
+            
+            // Log result
+            if (hasPermission) {
+                Logger.getInstance().logInfo("MANAGE_EXTERNAL_STORAGE permission granted")
+            } else {
+                Logger.getInstance().logWarning("MANAGE_EXTERNAL_STORAGE permission not granted")
             }
         }
     }
@@ -112,12 +136,8 @@ class PermissionManager(private val activity: AppCompatActivity) {
             val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
                 data = Uri.parse("package:${activity.packageName}")
             }
-            activity.startActivity(intent)
-            
-            // We can't automatically detect when this permission is granted,
-            // so we'll just inform the user that they need to restart the app
-            Logger.getInstance().logInfo("Requested MANAGE_EXTERNAL_STORAGE permission")
-            permissionCallback?.invoke(false)
+            manageStorageLauncher.launch(intent)
+            Logger.getInstance().logInfo("Launching MANAGE_EXTERNAL_STORAGE permission request")
         } catch (e: Exception) {
             Logger.getInstance().logError("Error requesting MANAGE_EXTERNAL_STORAGE permission", e)
             permissionCallback?.invoke(false)

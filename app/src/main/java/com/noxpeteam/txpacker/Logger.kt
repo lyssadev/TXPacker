@@ -154,18 +154,42 @@ class Logger private constructor(context: Context) {
     }
     
     /**
-     * Log a crash
+     * Log a crash - This will ALWAYS log, regardless of logging settings
      */
     fun logCrash(throwable: Throwable) {
         // Always log crashes to Android log
         Log.e(TAG, "App crashed", throwable)
         
-        if (!isLoggingEnabled() && getContext() != null) {
-            return
-        }
-        
+        // Force log the crash regardless of logging settings
         val logEntry = createLogEntry("CRASH", "App crashed", throwable)
         writeToLogFile(logEntry)
+        
+        // Show toast with log location
+        getContext()?.let { context ->
+            try {
+                val logDir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TXPacker/logs")
+                } else {
+                    File(Environment.getExternalStorageDirectory(), "TXPacker/logs")
+                }
+                
+                val logDirPath = if (logDir.exists()) {
+                    logDir.absolutePath
+                } else {
+                    context.getExternalFilesDir(null)?.absolutePath + "/logs"
+                }
+                
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.log_location_toast, "App crashed. ", logDirPath),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to show crash log location toast", e)
+            }
+        }
     }
     
     /**
