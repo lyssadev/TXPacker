@@ -25,7 +25,7 @@ TXPacker is an Android application designed to simplify the process of importing
 
 ## Installation
 
-1. Download the latest APK from the [Releases](https://github.com/yourusername/TXPacker/releases) page
+1. Download the latest APK from the [Releases](https://github.com/lyssadev/TXPacker/releases) page
 2. Enable "Install from Unknown Sources" in your Android settings if needed
 3. Open the APK and follow the installation prompts
 
