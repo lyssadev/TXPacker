@@ -271,6 +271,19 @@
                         android:text="@string/logging_disabled"
                         android:textColor="#9E9E9E"
                         android:textSize="14sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/goToLogsButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/go_to_logs"
+                        android:textAllCaps="false"
+                        android:letterSpacing="0.025"
+                        android:backgroundTint="#BB86FC"
+                        android:textColor="#000000"
+                        app:cornerRadius="28dp"
+                        android:fontFamily="sans-serif-medium" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

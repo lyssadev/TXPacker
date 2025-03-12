@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,16 +15,20 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.switchmaterial.SwitchMaterial
-import java.util.*
+import com.google.android.material.card.MaterialCardView
+import android.view.animation.DecelerateInterpolator
+import android.widget.LinearLayout
 
 class SettingsActivity : BaseActivity() {
     private var hasUnsavedChanges = false
@@ -33,6 +38,7 @@ class SettingsActivity : BaseActivity() {
     private lateinit var loggingSwitch: SwitchMaterial
     private lateinit var loggingStatusText: TextView
     private lateinit var teamCreditText: TextView
+    private lateinit var goToLogsButton: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +63,37 @@ class SettingsActivity : BaseActivity() {
         saveProgress = findViewById(R.id.saveProgress)
         loggingSwitch = findViewById(R.id.loggingSwitch)
         loggingStatusText = findViewById(R.id.loggingStatusText)
+        goToLogsButton = findViewById(R.id.goToLogsButton)
+
+        // Get all card views for animation
+        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        val linearLayout = scrollView.getChildAt(0) as LinearLayout
+        val cards = mutableListOf<View>()
+        for (i in 0 until linearLayout.childCount) {
+            val child = linearLayout.getChildAt(i)
+            if (child is MaterialCardView) {
+                // Initially hide all cards
+                child.alpha = 0f
+                child.translationY = 100f
+                cards.add(child)
+            }
+        }
+
+        // Animate cards sequentially
+        var delay = 0L
+        val animDuration = 400L
+        val staggerDelay = 100L
+
+        cards.forEach { card ->
+            card.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(animDuration)
+                .setStartDelay(delay)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+            delay += staggerDelay
+        }
 
         // Set version from BuildConfig
         versionText.text = getString(R.string.version, BuildConfig.VERSION_NAME)
@@ -195,6 +232,54 @@ class SettingsActivity : BaseActivity() {
         // Handle save button
         saveButton.setOnClickListener {
             saveChanges()
+        }
+
+        // Handle "Go to logs" button click
+        goToLogsButton.setOnClickListener {
+            try {
+                val logFile = Logger.getInstance().getLogFiles().firstOrNull()
+                if (logFile != null) {
+                    val logDir = logFile.parentFile
+                    if (logDir != null && logDir.exists()) {
+                        try {
+                            // Use Storage Access Framework to open folder
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                val uri = FileProvider.getUriForFile(
+                                    this@SettingsActivity,
+                                    "${packageName}.fileprovider",
+                                    logDir
+                                )
+                                setDataAndType(uri, "resource/folder")
+                            }
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Logger.getInstance().logError("Could not open file explorer", e)
+                            // Try alternative method using system file manager
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.setClassName(
+                                    "com.android.documentsui",
+                                    "com.android.documentsui.files.FilesActivity"
+                                )
+                                startActivity(intent)
+                                // Show toast with location since we can't navigate directly
+                                Logger.getInstance().showLogLocationToast()
+                            } catch (e2: Exception) {
+                                Logger.getInstance().logError("Could not open system file manager", e2)
+                                Logger.getInstance().showLogLocationToast()
+                            }
+                        }
+                    } else {
+                        Logger.getInstance().showLogLocationToast()
+                    }
+                } else {
+                    Logger.getInstance().showLogLocationToast()
+                }
+            } catch (e: Exception) {
+                Logger.getInstance().logError("Error opening logs directory", e)
+                Logger.getInstance().showLogLocationToast()
+            }
         }
     }
     

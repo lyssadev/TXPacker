@@ -55,4 +55,5 @@
     <string name="minecraft_not_installed_message">Minecraft no está instalado en tu dispositivo. Necesitas instalar Minecraft para usar esta aplicación.</string>
     <string name="install">Instalar</string>
     <string name="error_open_store">No se pudo abrir Play Store. Por favor, instala Minecraft manualmente.</string>
+    <string name="go_to_logs">Ver registros</string>
 </resources> 

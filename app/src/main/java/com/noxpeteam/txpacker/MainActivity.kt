@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -277,7 +278,7 @@ class MainActivity : BaseActivity() {
             it.getString(nameIndex)
         } ?: uri.lastPathSegment ?: "Unknown file"
     }
-
+    
     private fun animateFileSelection() {
         // Create animations
         val selectedFileFadeIn = ObjectAnimator.ofFloat(selectedFileContainer, View.ALPHA, 0f, 1f).apply {
@@ -582,4 +583,4 @@ class MainActivity : BaseActivity() {
             Logger.getInstance().logError("Error setting locale", e)
         }
     }
-} 
+}

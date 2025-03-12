@@ -24,9 +24,20 @@ class Logger private constructor(context: Context) {
     // Use WeakReference to avoid memory leaks
     private val contextRef: WeakReference<Context> = WeakReference(context.applicationContext)
     
+    // Data class to hold log entries
+    private data class LogEntry(
+        val timestamp: Long,
+        val level: String,
+        val message: String
+    )
+    
+    // List to store recent log entries in memory
+    private val logEntries = mutableListOf<LogEntry>()
+    
     companion object {
         private const val TAG = "TXPackerLogger"
         private const val LOG_FOLDER = "TXPacker/logs"
+        private const val LOG_FILE_NAME = "txpacker_all_in_one.log"
         private const val PREF_NAME = "Settings"
         private const val PREF_LOGGING_ENABLED = "logging_enabled"
         
@@ -105,6 +116,14 @@ class Logger private constructor(context: Context) {
             return
         }
         
+        synchronized(logEntries) {
+            logEntries.add(LogEntry(System.currentTimeMillis(), "WARNING", message))
+            // Keep only last 100 entries
+            if (logEntries.size > 100) {
+                logEntries.removeAt(0)
+            }
+        }
+        
         val logEntry = createLogEntry("WARNING", message, throwable)
         writeToLogFile(logEntry)
         Log.w(TAG, message, throwable)
@@ -116,6 +135,14 @@ class Logger private constructor(context: Context) {
     fun logError(message: String, throwable: Throwable? = null) {
         // Always log errors to Android log
         Log.e(TAG, message, throwable)
+        
+        synchronized(logEntries) {
+            logEntries.add(LogEntry(System.currentTimeMillis(), "ERROR", message))
+            // Keep only last 100 entries
+            if (logEntries.size > 100) {
+                logEntries.removeAt(0)
+            }
+        }
         
         if (!isLoggingEnabled() && getContext() != null) {
             return
@@ -149,6 +176,14 @@ class Logger private constructor(context: Context) {
             // Only log to Android log if logging is disabled
             Log.i(TAG, message)
             return
+        }
+        
+        synchronized(logEntries) {
+            logEntries.add(LogEntry(System.currentTimeMillis(), "INFO", message))
+            // Keep only last 100 entries
+            if (logEntries.size > 100) {
+                logEntries.removeAt(0)
+            }
         }
         
         val logEntry = createLogEntry("INFO", message, null)
@@ -265,19 +300,15 @@ class Logger private constructor(context: Context) {
                     Log.e(TAG, "Failed to create log directory: ${logDir.absolutePath}")
                     // Fallback to app-specific directory if public directory creation fails
                     getContext()?.let { context ->
-                        return File(context.getExternalFilesDir(null), "logs").apply {
-                            mkdirs()
+                        return File(context.getExternalFilesDir(null), "logs/${LOG_FILE_NAME}").apply {
+                            parentFile?.mkdirs()
                         }
                     }
                 }
             }
             
-            // Generate a unique log file name with timestamp and random ID
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-            val randomId = UUID.randomUUID().toString().substring(0, 8)
-            val fileName = "log-$timestamp-$randomId.txt"
+            return File(logDir, LOG_FILE_NAME)
             
-            return File(logDir, fileName)
         } catch (e: Exception) {
             Log.e(TAG, "Error creating log file", e)
             // Fallback to app-specific directory
@@ -285,10 +316,7 @@ class Logger private constructor(context: Context) {
                 val fallbackDir = File(context.getExternalFilesDir(null), "logs").apply {
                     mkdirs()
                 }
-                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                val randomId = UUID.randomUUID().toString().substring(0, 8)
-                val fileName = "log-$timestamp-$randomId.txt"
-                return File(fallbackDir, fileName)
+                return File(fallbackDir, LOG_FILE_NAME)
             } ?: throw e
         }
     }
@@ -297,7 +325,6 @@ class Logger private constructor(context: Context) {
      * Get all log files
      */
     fun getLogFiles(): List<File> {
-        // Try to get logs from both possible locations
         val logFiles = mutableListOf<File>()
         
         try {
@@ -309,8 +336,9 @@ class Logger private constructor(context: Context) {
             }
             
             if (primaryLogDir.exists()) {
-                primaryLogDir.listFiles()?.filter { it.isFile && it.name.startsWith("log-") }?.let {
-                    logFiles.addAll(it)
+                val logFile = File(primaryLogDir, LOG_FILE_NAME)
+                if (logFile.exists()) {
+                    logFiles.add(logFile)
                 }
             }
             
@@ -318,8 +346,9 @@ class Logger private constructor(context: Context) {
             getContext()?.let { context ->
                 val fallbackDir = File(context.getExternalFilesDir(null), "logs")
                 if (fallbackDir.exists()) {
-                    fallbackDir.listFiles()?.filter { it.isFile && it.name.startsWith("log-") }?.let {
-                        logFiles.addAll(it)
+                    val logFile = File(fallbackDir, LOG_FILE_NAME)
+                    if (logFile.exists()) {
+                        logFiles.add(logFile)
                     }
                 }
             }
@@ -327,31 +356,14 @@ class Logger private constructor(context: Context) {
             Log.e(TAG, "Error getting log files", e)
         }
         
-        return logFiles.sortedByDescending { it.lastModified() }
+        return logFiles
     }
     
     /**
      * Delete old log files, keeping only the most recent ones
      */
     fun cleanupOldLogs(maxLogsToKeep: Int = 10) {
-        try {
-            val logFiles = getLogFiles()
-            
-            if (logFiles.size > maxLogsToKeep) {
-                logFiles.subList(maxLogsToKeep, logFiles.size).forEach { 
-                    try {
-                        val deleted = it.delete()
-                        if (!deleted) {
-                            Log.w(TAG, "Failed to delete old log file: ${it.absolutePath}")
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error deleting log file: ${it.absolutePath}", e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error cleaning up old logs", e)
-        }
+        // No need to clean up old logs since we're using a single file
     }
     
     /**
@@ -360,4 +372,68 @@ class Logger private constructor(context: Context) {
     private fun getContext(): Context? {
         return contextRef.get()
     }
-} 
+    
+    /**
+     * Get the most recent error message related to a specific topic
+     * @param topic The topic to search for in error messages
+     * @return The most recent error message, or null if none found
+     */
+    fun getRecentErrorMessage(topic: String): String? {
+        if (!isLoggingEnabled()) {
+            return null
+        }
+        
+        try {
+            val logFiles = getLogFiles()
+            if (logFiles.isEmpty()) {
+                return null
+            }
+            
+            // Check the log file
+            val logFile = logFiles.first()
+            if (!logFile.exists() || logFile.length() == 0L) {
+                return null
+            }
+            
+            // Read the log file and look for error messages related to the topic
+            val logContent = logFile.readText()
+            val errorLines = logContent.lines().filter { 
+                it.contains("[ERROR]") && it.contains(topic, ignoreCase = true) 
+            }
+            
+            if (errorLines.isEmpty()) {
+                return null
+            }
+            
+            // Extract the actual error message without the timestamp and level
+            val lastError = errorLines.last()
+            val errorStart = lastError.indexOf("[ERROR]") + 8
+            return if (errorStart < lastError.length) {
+                lastError.substring(errorStart).trim()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting recent error message", e)
+            return null
+        }
+    }
+    
+    /**
+     * Get recent log entries that contain a specific prefix
+     */
+    fun getRecentLogEntries(prefix: String): List<String> {
+        val entries = mutableListOf<String>()
+        synchronized(logEntries) {
+            // Get up to 10 recent entries that match the prefix
+            for (i in logEntries.size - 1 downTo 0) {
+                if (logEntries[i].message.contains(prefix)) {
+                    entries.add(logEntries[i].message)
+                }
+                // Limit to 10 entries to avoid overwhelming the UI
+                if (entries.size >= 10) break
+            }
+        }
+        return entries
+    }
+}
