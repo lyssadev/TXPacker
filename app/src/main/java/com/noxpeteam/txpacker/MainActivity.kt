@@ -323,7 +323,7 @@ class MainActivity : BaseActivity() {
                 // Set appropriate MIME type based on file extension
                 val mimeType = when {
                     fileName.endsWith(".mcworld") -> "application/x-world"
-                    else -> "application/zip"  // For .mcpack and .mcaddon
+                    else -> "application/octet-stream"  // Changed from "application/zip" to "application/octet-stream" for .mcpack files
                 }
                 setDataAndType(uri, mimeType)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -331,9 +331,9 @@ class MainActivity : BaseActivity() {
                 `package` = minecraftPackage
             }
             
-            // Check if the intent can be resolved
-            if (intent.resolveActivity(packageManager) != null) {
-                Logger.getInstance().logInfo("Minecraft app found, starting intent")
+            // Try to start the activity directly without checking resolveActivity first
+            try {
+                Logger.getInstance().logInfo("Starting intent with MIME type: ${intent.type}")
                 startActivity(intent)
                 
                 // Show success message and close app after a short delay
@@ -351,8 +351,8 @@ class MainActivity : BaseActivity() {
                         android.os.Process.killProcess(android.os.Process.myPid())
                     }, 1000)
                 }, 500)
-            } else {
-                throw Exception("Unable to start Minecraft")
+            } catch (e: Exception) {
+                throw Exception("Unable to start Minecraft: ${e.message}")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading Minecraft content: ${e.message}", e)
