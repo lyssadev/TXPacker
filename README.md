@@ -2,7 +2,7 @@
 
 TXPacker is an Android application designed to simplify the process of importing resource packs, addons, and worlds into Minecraft Bedrock Edition. With a modern, user-friendly interface and smooth animations, it provides a seamless experience for managing Minecraft content.
 
-![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Min SDK](https://img.shields.io/badge/min%20SDK-24-orange.svg)
 
