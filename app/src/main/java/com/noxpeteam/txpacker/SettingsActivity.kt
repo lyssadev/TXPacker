@@ -323,10 +323,14 @@ class SettingsActivity : BaseActivity() {
                     // Update text color with fade
                     val colorAnim = ObjectAnimator.ofArgb(
                         prev,
-                        "textColor",
+                        "currentTextColor",
                         getColor(R.color.primary),
                         getColor(R.color.text_secondary)
-                    )
+                    ).apply {
+                        addUpdateListener { animator ->
+                            prev.setTextColor(animator.animatedValue as Int)
+                        }
+                    }
                     colorAnim.duration = 250
                     colorAnim.start()
                 }

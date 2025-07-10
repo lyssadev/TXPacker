@@ -1,6 +1,7 @@
 package com.noxpeteam.txpacker
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -131,6 +132,7 @@ class PermissionManager(private val activity: AppCompatActivity) {
     /**
      * Request MANAGE_EXTERNAL_STORAGE permission for Android 11+ (API 30+)
      */
+    @TargetApi(Build.VERSION_CODES.R)
     private fun requestManageExternalStoragePermission() {
         try {
             val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {

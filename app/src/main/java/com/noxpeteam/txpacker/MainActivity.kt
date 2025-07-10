@@ -19,6 +19,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityOptionsCompat
@@ -125,58 +126,77 @@ class MainActivity : BaseActivity() {
     private fun setupInitialAnimations() {
         val titleText: TextView = findViewById(R.id.titleText)
         val subtitleText: TextView = findViewById(R.id.subtitleText)
-        val instructionsText: TextView = findViewById(R.id.instructionsText)
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
         // Reset initial states
         titleText.apply {
             alpha = 0f
-            translationY = 50f
+            translationY = -80f
+            scaleX = 0.8f
+            scaleY = 0.8f
         }
         subtitleText.apply {
             alpha = 0f
-            translationY = 30f
+            translationY = -40f
         }
-        instructionsText.alpha = 0f
-        settingsButton.alpha = 0f
-        importButton.alpha = 0f
+        settingsButton.apply {
+            alpha = 0f
+            scaleX = 0f
+            scaleY = 0f
+        }
+        importButton.apply {
+            alpha = 0f
+            translationY = 60f
+            scaleX = 0.9f
+            scaleY = 0.9f
+        }
 
-        // Create and start animations
+        // Create smooth animation sequence
         AnimatorSet().apply {
             playSequentially(
-                // Title animation
+                // Settings button appears first
+                AnimatorSet().apply {
+                    playTogether(
+                        ObjectAnimator.ofFloat(settingsButton, View.ALPHA, 0f, 1f),
+                        ObjectAnimator.ofFloat(settingsButton, View.SCALE_X, 0f, 1f),
+                        ObjectAnimator.ofFloat(settingsButton, View.SCALE_Y, 0f, 1f)
+                    )
+                    duration = 400
+                    interpolator = OvershootInterpolator(1.2f)
+                },
+
+                // Title animation with scale and position
                 AnimatorSet().apply {
                     playTogether(
                         ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f, 1f),
-                        ObjectAnimator.ofFloat(titleText, View.TRANSLATION_Y, 50f, 0f)
+                        ObjectAnimator.ofFloat(titleText, View.TRANSLATION_Y, -80f, 0f),
+                        ObjectAnimator.ofFloat(titleText, View.SCALE_X, 0.8f, 1f),
+                        ObjectAnimator.ofFloat(titleText, View.SCALE_Y, 0.8f, 1f)
                     )
                     duration = 600
-                    interpolator = DecelerateInterpolator(1.5f)
+                    interpolator = DecelerateInterpolator()
                 },
-                // Subtitle animation
+
+                // Subtitle slides up
                 AnimatorSet().apply {
                     playTogether(
                         ObjectAnimator.ofFloat(subtitleText, View.ALPHA, 0f, 1f),
-                        ObjectAnimator.ofFloat(subtitleText, View.TRANSLATION_Y, 30f, 0f)
+                        ObjectAnimator.ofFloat(subtitleText, View.TRANSLATION_Y, -40f, 0f)
                     )
-                    duration = 500
-                    startDelay = 100
-                    interpolator = DecelerateInterpolator()
-                },
-                // Instructions fade in
-                ObjectAnimator.ofFloat(instructionsText, View.ALPHA, 0f, 1f).apply {
                     duration = 400
-                    startDelay = 50
                     interpolator = DecelerateInterpolator()
                 },
-                // Buttons fade in
+
+                // Button appears with bounce
                 AnimatorSet().apply {
                     playTogether(
                         ObjectAnimator.ofFloat(importButton, View.ALPHA, 0f, 1f),
-                        ObjectAnimator.ofFloat(settingsButton, View.ALPHA, 0f, 1f)
+                        ObjectAnimator.ofFloat(importButton, View.TRANSLATION_Y, 60f, 0f),
+                        ObjectAnimator.ofFloat(importButton, View.SCALE_X, 0.9f, 1f),
+                        ObjectAnimator.ofFloat(importButton, View.SCALE_Y, 0.9f, 1f)
                     )
-                    duration = 400
-                    interpolator = DecelerateInterpolator()
+                    duration = 500
+                    interpolator = OvershootInterpolator(1.1f)
                 }
             )
             start()
@@ -184,23 +204,79 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupClickListeners() {
-        importButton.setOnClickListener {
-            openFilePicker()
-        }
-
-        loadButton.setOnClickListener {
-            selectedFile?.let { uri ->
-                loadResourcePack(uri)
+        importButton.setOnClickListener { view ->
+            animateButtonPress(view) {
+                openFilePicker()
             }
         }
 
-        findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent, ActivityOptionsCompat.makeCustomAnimation(
-                this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
-            ).toBundle())
+        loadButton.setOnClickListener { view ->
+            animateButtonPress(view) {
+                selectedFile?.let { uri ->
+                    loadResourcePack(uri)
+                }
+            }
+        }
+
+        findViewById<ImageButton>(R.id.settingsButton).setOnClickListener { view ->
+            animateButtonPress(view) {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent, ActivityOptionsCompat.makeCustomAnimation(
+                    this,
+                    android.R.anim.fade_in,
+                    android.R.anim.fade_out
+                ).toBundle())
+            }
+        }
+    }
+
+    private fun animateButtonPress(view: View, action: () -> Unit) {
+        val scaleDown = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f, 0.95f),
+                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f, 0.95f)
+            )
+            duration = 100
+            interpolator = DecelerateInterpolator()
+        }
+
+        val scaleUp = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(view, View.SCALE_X, 0.95f, 1f),
+                ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.95f, 1f)
+            )
+            duration = 100
+            interpolator = OvershootInterpolator(1.2f)
+        }
+
+        AnimatorSet().apply {
+            playSequentially(scaleDown, scaleUp)
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    action()
+                }
+            })
+            start()
+        }
+    }
+
+    private fun hideProgressBar() {
+        if (progressBar.visibility == View.VISIBLE) {
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(progressBar, View.ALPHA, 1f, 0f),
+                    ObjectAnimator.ofFloat(progressBar, View.SCALE_X, 1f, 0.8f),
+                    ObjectAnimator.ofFloat(progressBar, View.SCALE_Y, 1f, 0.8f)
+                )
+                duration = 200
+                interpolator = DecelerateInterpolator()
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        progressBar.visibility = View.GONE
+                    }
+                })
+                start()
+            }
         }
     }
 
@@ -248,7 +324,6 @@ class MainActivity : BaseActivity() {
             loadButton.apply {
                 visibility = View.VISIBLE
                 alpha = 0f
-                translationY = 100f
             }
             
             // Animate the UI changes
@@ -270,25 +345,43 @@ class MainActivity : BaseActivity() {
     }
     
     private fun animateFileSelection() {
-        // Create animations
-        val selectedFileFadeIn = ObjectAnimator.ofFloat(selectedFileContainer, View.ALPHA, 0f, 1f).apply {
+        // Set initial states for new layout
+        selectedFileContainer.apply {
+            scaleX = 0.8f
+            scaleY = 0.8f
+        }
+        loadButton.apply {
+            translationY = 40f
+            scaleX = 0.9f
+            scaleY = 0.9f
+        }
+
+        // Create modern animations
+        val selectedFileAnimator = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(selectedFileContainer, View.ALPHA, 0f, 1f),
+                ObjectAnimator.ofFloat(selectedFileContainer, View.SCALE_X, 0.8f, 1f),
+                ObjectAnimator.ofFloat(selectedFileContainer, View.SCALE_Y, 0.8f, 1f)
+            )
             duration = 300
-            interpolator = DecelerateInterpolator()
+            interpolator = OvershootInterpolator(1.1f)
         }
 
         val loadButtonAnimator = AnimatorSet().apply {
             playTogether(
                 ObjectAnimator.ofFloat(loadButton, View.ALPHA, 0f, 1f),
-                ObjectAnimator.ofFloat(loadButton, View.TRANSLATION_Y, 100f, 0f)
+                ObjectAnimator.ofFloat(loadButton, View.TRANSLATION_Y, 40f, 0f),
+                ObjectAnimator.ofFloat(loadButton, View.SCALE_X, 0.9f, 1f),
+                ObjectAnimator.ofFloat(loadButton, View.SCALE_Y, 0.9f, 1f)
             )
-            duration = 600  // Increased duration for smoother animation over longer distance
-            interpolator = DecelerateInterpolator(1.5f)
+            duration = 400
+            interpolator = OvershootInterpolator(1.2f)
         }
 
-        // Start animations
+        // Start animations sequentially
         AnimatorSet().apply {
             playSequentially(
-                selectedFileFadeIn,
+                selectedFileAnimator,
                 loadButtonAnimator
             )
             start()
@@ -308,8 +401,24 @@ class MainActivity : BaseActivity() {
             }
 
             // Show loading animation
-            progressBar.visibility = View.VISIBLE
+            progressBar.apply {
+                visibility = View.VISIBLE
+                alpha = 0f
+                scaleX = 0.8f
+                scaleY = 0.8f
+            }
             loadButton.isEnabled = false
+
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(progressBar, View.ALPHA, 0f, 1f),
+                    ObjectAnimator.ofFloat(progressBar, View.SCALE_X, 0.8f, 1f),
+                    ObjectAnimator.ofFloat(progressBar, View.SCALE_Y, 0.8f, 1f)
+                )
+                duration = 300
+                interpolator = OvershootInterpolator(1.1f)
+                start()
+            }
             
             // Get file name and determine mime type
             val fileName = getFileName(uri)
@@ -358,8 +467,8 @@ class MainActivity : BaseActivity() {
             Log.e(TAG, "Error loading Minecraft content: ${e.message}", e)
             Logger.getInstance().logError("Error loading Minecraft content", e)
             showMinecraftNotInstalledDialog()
-            // Reset UI state on error
-            progressBar.visibility = View.GONE
+            // Reset UI state on error with animation
+            hideProgressBar()
             loadButton.isEnabled = true
         }
     }
@@ -390,7 +499,7 @@ class MainActivity : BaseActivity() {
             .setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
                 // Reset UI state
-                progressBar.visibility = View.GONE
+                hideProgressBar()
                 loadButton.isEnabled = true
             }
             .setCancelable(false)
